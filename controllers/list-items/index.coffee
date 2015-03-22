@@ -34,10 +34,47 @@ exports.create = (req, res) ->
 # multiple selectors can be seperated by /s, like
 # `/items/@store/glue` -> `glue sticks @store`
 exports.show = (req, res) ->
-  matches = todos
   params = req.url.toLowerCase().split("/").slice(2)
+  matches = exports.select(params)
 
-  for selector in params
+  res.setHeader "content-type", "text/plain"
+  res.send todotxt.render(matches)
+
+exports.edit = (req, res) ->
+  res.send('edit item ' + req.params.item)
+
+exports.update = (req, res) ->
+  oldItem = todotxt.parse req.url.toLowerCase().split("/").slice(2)
+  newItem = todotxt.parse req.body
+  index = todos.indexOf oldItem
+
+  if index isnt -1
+    todos[index] = newItem
+    exports.writeChangesToFile todos, (err) ->
+      res.send {
+        status: "OK",
+        method: "update",
+        msg: "Updates new todo item to: #{newItem}"
+      }
+
+  else
+    res.send {
+      status: "ERR",
+      method: "update",
+      msg: "#{oldItem} isn't in the list."
+    }
+
+
+exports.destroy = (req, res) ->
+  res.send('destroy item ' + req.params.item)
+
+
+
+# select a new item from an array of selectors passed
+exports.select = (selectors) ->
+  matches = todos
+
+  for selector in selectors
     matches = switch selector[0]
 
       # search by context
@@ -58,18 +95,7 @@ exports.show = (req, res) ->
             (i.text.toLowerCase().split(' ') or [])
           ).length
 
-  res.setHeader "content-type", "text/plain"
-  res.send todotxt.render(matches)
-
-exports.edit = (req, res) ->
-  res.send('edit item ' + req.params.item)
-
-exports.update = (req, res) ->
-  res.send('update item ' + req.params.item)
-
-exports.destroy = (req, res) ->
-  res.send('destroy item ' + req.params.item)
-
+  matches
 
 # update todo.txt file from local cache
 exports.writeChangesToFile = (todos, callback) ->
