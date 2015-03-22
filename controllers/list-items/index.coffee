@@ -34,7 +34,7 @@ exports.create = (req, res) ->
 # multiple selectors can be seperated by /s, like
 # `/items/@store/glue` -> `glue sticks @store`
 exports.show = (req, res) ->
-  params = req.url.toLowerCase().split("/").slice(2)
+  params = req.url.toLowerCase().split("?")[0].split("/").slice(2)
   matches = exports.select(params)
 
   res.setHeader "content-type", "text/plain"
@@ -48,10 +48,19 @@ exports.edit = (req, res) ->
 exports.update = (req, res) ->
   newItem = todotxt.parse req.body
 
-  params = req.url.toLowerCase().split("/").slice(2)
+  params = req.url.toLowerCase().split("?")[0].split("/").slice(2)
   matches = exports.select(params)
 
-  if matches.length
+  # warn user
+  if matches.length > 5 and not "?confirm" in req.url
+    res.send {
+      status: "ERR",
+      method: "update",
+      msg: "Hmm, this query would update #{matches.length} items - add ?confirm to allow this."
+    }
+
+
+  else if matches.length > 0
     for item in matches
       todos[todos.indexOf(item)] = newItem
 
@@ -59,7 +68,7 @@ exports.update = (req, res) ->
       res.send {
         status: "OK",
         method: "update",
-        msg: "Updates new todo item to: #{newItem}"
+        msg: "Updated new todo item to: #{newItem}"
       }
 
   else
