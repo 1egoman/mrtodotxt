@@ -43,13 +43,18 @@ exports.show = (req, res) ->
 exports.edit = (req, res) ->
   res.send('edit item ' + req.params.item)
 
+# update to the body content using selectors
+# to pick what to update
 exports.update = (req, res) ->
-  oldItem = todotxt.parse req.url.toLowerCase().split("/").slice(2)
   newItem = todotxt.parse req.body
-  index = todos.indexOf oldItem
 
-  if index isnt -1
-    todos[index] = newItem
+  params = req.url.toLowerCase().split("/").slice(2)
+  matches = exports.select(params)
+
+  if matches.length
+    for item in matches
+      todos[todos.indexOf(item)] = newItem
+
     exports.writeChangesToFile todos, (err) ->
       res.send {
         status: "OK",
@@ -61,14 +66,12 @@ exports.update = (req, res) ->
     res.send {
       status: "ERR",
       method: "update",
-      msg: "#{oldItem} isn't in the list."
+      msg: "#{params.join('/')} doesn't match anything."
     }
 
 
 exports.destroy = (req, res) ->
   res.send('destroy item ' + req.params.item)
-
-
 
 # select a new item from an array of selectors passed
 exports.select = (selectors) ->

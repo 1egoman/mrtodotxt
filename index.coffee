@@ -10,7 +10,7 @@ app.get("/items", listItems.index)
 # app.get("/items/:item/edit", listItems.edit)
 app.get("/items/([\w\/\@\+]*)", listItems.show)
 app.post("/items", listItems.create)
-app.put("/items/:item", listItems.update)
+app.put("/items/([\w\/\@\+]*)", listItems.update)
 app.delete("/items/:item", listItems.destroy)
 
 # listen for server response
