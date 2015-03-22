@@ -11,6 +11,7 @@ in the root and run with `coffee index.coffee`. Many queries return with
 Outputs the full todo.txt file.
 ```
 GET /items
+
 (A) Thank Mom for the meatballs @phone
 (B) Schedule Goodwill pickup +GarageSale @phone
 Post signs around the neighborhood +GarageSale
@@ -25,10 +26,13 @@ Outputs all items that match the selector(s). These can take the form of:
 
 ```
 GET /items/@phone
+
 (A) Thank Mom for the meatballs @phone
 (B) Schedule Goodwill pickup +GarageSale @phone
 
+
 GET /items/@phone/mom
+
 (A) Thank Mom for the meatballs @phone
 ```
 
