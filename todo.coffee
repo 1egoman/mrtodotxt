@@ -39,7 +39,10 @@ class TodoList
     fs.writeFile args.name, @todos, (err) ->
       callback err or null
 
+  # create a new list item in teh list
   create: (text) ->
+    @todos.push todotxt.parse(text)
+    todotxt.render(@todos)
 
   # select todo list items that match the selectors
   select: (selectors=[], callback) ->
