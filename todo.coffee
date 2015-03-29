@@ -2,6 +2,7 @@ fs = require "fs"
 path = require "path"
 _ = require "underscore"
 todotxt = (require "jsTodoTxt").TodoTxt
+chalk = require "chalk"
 
 class TodoList
   constructor: (@todoFile="./todo.txt") ->
@@ -68,4 +69,15 @@ class TodoList
 
 
 
-module.exports = TodoFilter
+exports.TodoList = TodoList
+
+# prettyprint a todo.txt formatted string
+exports.log = (todoList, title=null) ->
+  if title
+    rule = ('-' for _ in title.split '').join ''
+    console.log "#{title}\n#{rule}"
+  todoList = todoList.replace /(\(.\))/gi, chalk.red("$1")
+  todoList = todoList.replace /([+][\w]+)/gi, chalk.green("$1")
+  todoList = todoList.replace /([@][\w]+)/gi, chalk.blue("$1")
+  todoList = todoList.replace /([\d]{1,4}[-/][\d]{1,4}[-/][\d]{1,4})/gi, chalk.magenta("$1")
+  console.log todoList

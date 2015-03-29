@@ -1,5 +1,5 @@
-Todo = require "./todo"
+t = require "./todo"
 
-todo = new Todo null
-todo.select [], (all) ->
-  console.log all
+todo = new t.TodoList
+todo.select ["@phone"], (all) ->
+  t.log all, "title"
