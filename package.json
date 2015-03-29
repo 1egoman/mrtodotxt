@@ -10,9 +10,10 @@
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.12.2",
+    "chalk": "^1.0.0",
     "express": "^4.12.3",
     "express-static": "^1.0.3",
-    "jstodotxt": "^0.5.1",
+    "jstodotxt": "jmhobbs/jsTodoTxt",
     "underscore": "^1.8.2"
   }
 }
