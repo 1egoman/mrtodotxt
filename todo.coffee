@@ -69,30 +69,55 @@ class TodoList
               (i.text.toLowerCase().split(' ') or [])
             ).length
 
-    callback todotxt.render(matches)
+    if callback
+      callback todotxt.render(matches)
+    else
+      todotxt.render(matches)
 
   # update the given items based upon
   update: (selection, update, callback) ->
     update = todotxt.render(update) if typeof update isnt "string"
+    selection = @select([selection]) if typeof selection isnt "object"
 
     # update each selected item with the updated text
     updates = _.intersection @todos, selection
     todoList = todotxt.render(@todos).split '\n'
     for sel in selection.split '\n'
       todoList[todoList.indexOf sel] = update
+    todoList = _.compact(todoList).join '\n'
 
     # decompile the new todo list
-    @todos = todotxt.parse(todoList.join '\n')
+    @todos = todotxt.parse(todoList)
 
-    callback(todoList.join '\n') if callback
-    todoList.join '\n'
+    callback(todoList) if callback
+    todoList
 
+  # delete the specified item
   delete: (selection, callback) ->
+    if typeof selection is "object"
+      selection = todotxt.render(selection)
+    else
+      selection = @select([selection])
+
+    # update each selected item with the updated text
+    updates = _.intersection @todos, selection
+    todoList = todotxt.render(@todos).split '\n'
+    for sel in selection.split '\n'
+      delete todoList[todoList.indexOf sel]
+    todoList = _.compact(todoList).join '\n'
+
+    # decompile the new todo list
+    @todos = todotxt.parse(todoList)
+
+    callback(todoList) if callback
+    todoList
 
 exports.TodoList = TodoList
 
 # prettyprint a todo.txt formatted string
 exports.log = (todoList, title=null) ->
+  todoList = todotxt.render(todoList.todos) if typeof todoList isnt "string"
+
   if title
     rule = ('-' for _ in title.split '').join ''
     console.log "#{title}\n#{rule}"

@@ -2,4 +2,5 @@ t = require "./todo"
 
 todo = new t.TodoList
 todo.select ["@phone"], (all) ->
-  t.log todo.update(all, "another item")
+  todo.update("x Eskimo pies @GroceryStore", "hi @phone")
+  t.log todo
