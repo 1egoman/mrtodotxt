@@ -41,6 +41,7 @@ class TodoList
 
   create: (text) ->
 
+  # select todo list items that match the selectors
   select: (selectors=[], callback) ->
     matches = @todos
 
@@ -67,7 +68,23 @@ class TodoList
 
     callback todotxt.render(matches)
 
+  # update the given items based upon
+  update: (selection, update, callback) ->
+    update = todotxt.render(update) if typeof update isnt "string"
 
+    # update each selected item with the updated text
+    updates = _.intersection @todos, selection
+    todoList = todotxt.render(@todos).split '\n'
+    for sel in selection.split '\n'
+      todoList[todoList.indexOf sel] = update
+
+    # decompile the new todo list
+    @todos = todotxt.parse(todoList.join '\n')
+
+    callback(todoList.join '\n') if callback
+    todoList.join '\n'
+
+  delete: (selection, callback) ->
 
 exports.TodoList = TodoList
 
@@ -80,4 +97,5 @@ exports.log = (todoList, title=null) ->
   todoList = todoList.replace /([+][\w]+)/gi, chalk.green("$1")
   todoList = todoList.replace /([@][\w]+)/gi, chalk.blue("$1")
   todoList = todoList.replace /([\d]{1,4}[-/][\d]{1,4}[-/][\d]{1,4})/gi, chalk.magenta("$1")
+  todoList = todoList.replace /^[xX]/gim, chalk.yellow("x")
   console.log todoList
