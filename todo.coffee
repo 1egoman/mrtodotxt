@@ -3,10 +3,17 @@ path = require "path"
 _ = require "underscore"
 todotxt = (require "jsTodoTxt").TodoTxt
 chalk = require "chalk"
+watch = require "watch"
 
 class TodoList
-  constructor: (@todoFile="./todo.txt") ->
+  constructor: (@options={}, @todoFile="./todo.txt") ->
     @getFileSync()
+
+    # watch for local file updates and update the cache
+    if @options.watch
+      watch.watchTree path.dirname(@todoFile), (f, curr, prev) =>
+        if prev and curr
+          @getFile()
 
   # get todo.txt file contents from disk and save a
   # local cache white also reterning a copy
@@ -18,7 +25,7 @@ class TodoList
       callback err if err
 
       @todos = todotxt.parse(data)
-      callback null, @todos
+      callback null, @todos if callback
 
   # get todo.txt file contents from disk and save a
   # local cache white also reterning a copy, all syncronously
