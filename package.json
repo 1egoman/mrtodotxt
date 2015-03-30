@@ -1,6 +1,6 @@
 {
   "name": "mrtodotxt",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "TODO.txt class for simple management",
   "main": "index.js",
   "scripts": {

@@ -48,7 +48,7 @@ class TodoList
 
   # create a new list item in teh list
   create: (text) ->
-    @todos.push todotxt.parse(text)
+    @todos.push todotxt.parse(text)[0]
     todotxt.render(@todos)
 
   # select todo list items that match the selectors
@@ -119,6 +119,41 @@ class TodoList
     callback(todoList) if callback
     todoList
 
+  # "check off" an item after completion
+  mark: (selection, callback) ->
+    selection = @select([selection]) if typeof selection isnt "object"
+
+    # update each selected item with the updated text
+    updates = _.intersection @todos, selection
+    todoList = todotxt.render(@todos).split '\n'
+    for sel in selection.split '\n'
+      todoList[todoList.indexOf sel] = "x "+todoList[todoList.indexOf sel]
+    todoList = _.compact(todoList).join '\n'
+
+    # decompile the new todo list
+    @todos = todotxt.parse(todoList)
+
+    callback(todoList) if callback
+    todoList
+
+  # un-"check off" an item after completion
+  unmark: (selection, callback) ->
+    selection = @select([selection]) if typeof selection isnt "object"
+
+    # update each selected item with the updated text
+    updates = _.intersection @todos, selection
+    todoList = todotxt.render(@todos).split '\n'
+    for sel in selection.split '\n'
+      todoList[todoList.indexOf sel] = todoList[todoList.indexOf sel].replace(/^[xX]/gim, '').trim()
+    todoList = _.compact(todoList).join '\n'
+
+    # decompile the new todo list
+    @todos = todotxt.parse(todoList)
+
+    callback(todoList) if callback
+    todoList
+
+
 exports.TodoList = TodoList
 
 # prettyprint a todo.txt formatted string
@@ -126,11 +161,11 @@ exports.log = (todoList, title=null) ->
   todoList = todotxt.render(todoList.todos) if typeof todoList isnt "string"
 
   if title
-    rule = ('-' for _ in title.split '').join ''
+    rule = ('-' for q in title.split '').join ''
     console.log "#{title}\n#{rule}"
   todoList = todoList.replace /(\(.\))/gi, chalk.red("$1")
   todoList = todoList.replace /([+][\w]+)/gi, chalk.green("$1")
   todoList = todoList.replace /([@][\w]+)/gi, chalk.blue("$1")
   todoList = todoList.replace /([\d]{1,4}[-/][\d]{1,4}[-/][\d]{1,4})/gi, chalk.magenta("$1")
   todoList = todoList.replace /^[xX]/gim, chalk.yellow("x")
-  console.log todoList
+  console.log todoList, "\n"
